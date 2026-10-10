@@ -1,5 +1,5 @@
 import { formatWhen, sofiaToday } from "./sofia-time.js";
-import { isUpcoming, googleCalendarUrl, monthGrid, addMonths, meetsByDay } from "./meets.js";
+import { isUpcoming, googleCalendarUrl, monthGrid, addMonths, meetsByDay, parseListState, listHash, selectMeets } from "./meets.js";
 
 const chipsEl = document.getElementById("chips");
 const headerEl = document.getElementById("club-header");
@@ -74,16 +74,24 @@ function el(tag, props = {}, ...children) {
   return node;
 }
 
-function selectedClub() {
-  const m = /club=([a-z-]+)/.exec(location.hash);
-  return m && site.clubs.some((c) => c.id === m[1]) ? m[1] : "all";
+const viewsEl = document.getElementById("views");
+
+function listState() {
+  return parseListState(location.hash, site.clubs.map((c) => c.id));
 }
 
-function renderChips(current) {
+function renderViews(state) {
+  const tab = (view, text) =>
+    el("a", { class: "view-tab", href: listHash({ ...state, view }), "aria-current": state.view === view ? "true" : null, text });
+  viewsEl.replaceChildren(tab("upcoming", "Upcoming"), tab("past", "Past meets"));
+}
+
+function renderChips(state) {
+  const current = state.club;
   const chips = [{ id: "all", short: "All meets" }, ...site.clubs].map((c) =>
     el("a", {
       class: "chip",
-      href: c.id === "all" ? "#" : `#club=${c.id}`,
+      href: listHash({ ...state, club: c.id }),
       "aria-current": c.id === current ? "true" : null,
       style: c.accent ? `--accent:${c.accent}` : null,
       text: c.short,
@@ -120,7 +128,8 @@ function meetCard(ev, clubsById) {
     el(
       "p",
       { class: "badges" },
-      el("a", { class: "badge", href: `#club=${club.id}`, text: club.short }),
+      el("a", { class: "badge", href: listHash({ ...listState(), club: club.id }), text: club.short }),
+      isUpcoming(ev, Date.now()) ? null : el("span", { class: "badge past", text: "Past" }),
       ev.example ? el("span", { class: "badge example", title: "Sample data, not a real meet", text: "Example meet" }) : null,
     ),
     el("p", { class: "where", text: where }),
@@ -130,6 +139,8 @@ function meetCard(ev, clubsById) {
       el("summary", { text: "Details and who's coming" }),
       ev.description ? el("p", { text: ev.description }) : null,
       cars,
+      // Adding a meet that already happened to a calendar helps nobody.
+      isUpcoming(ev, Date.now()) &&
       el(
         "p",
         { class: "actions" },
@@ -141,16 +152,18 @@ function meetCard(ev, clubsById) {
 }
 
 function render() {
-  const current = selectedClub();
+  const state = listState();
   const clubsById = Object.fromEntries(site.clubs.map((c) => [c.id, c]));
-  renderChips(current);
-  renderClubHeader(clubsById[current]);
-  const now = Date.now();
-  const items = site.events.filter((ev) => isUpcoming(ev, now) && (current === "all" || ev.club === current));
+  renderChips(state);
+  renderViews(state);
+  renderClubHeader(clubsById[state.club]);
+  const items = selectMeets(site.events, { ...state, now: Date.now() });
   renderCalendar(items, clubsById);
   if (!items.length) {
     meetsEl.replaceChildren(
-      el("p", { class: "empty" }, "No upcoming meets here yet. ", el("a", { href: "plan.html", text: "Plan one from your group chat" }), "."),
+      state.view === "past"
+        ? el("p", { class: "empty", text: "No past meets here yet. Once a meet has happened, it moves here." })
+        : el("p", { class: "empty" }, "No upcoming meets here yet. ", el("a", { href: "plan.html", text: "Plan one from your group chat" }), "."),
     );
     return;
   }

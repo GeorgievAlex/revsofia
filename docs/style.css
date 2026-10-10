@@ -95,3 +95,7 @@ header.site nav a { white-space: nowrap; }
   .wordmark { display: none; }
   .logo { width: 30px; height: 30px; }
 }
+.views { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; padding: 3px; margin: 0 0 16px; gap: 2px; }
+.view-tab { text-decoration: none; padding: 6px 14px; border-radius: 7px; color: var(--muted); font-size: 0.92rem; }
+.view-tab[aria-current="true"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 0 0 1px var(--line); }
+.badge.past { background: transparent; border: 1px solid var(--line); color: var(--muted); }

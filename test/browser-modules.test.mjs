@@ -116,3 +116,28 @@ test("sofiaToday uses Sofia's date, not UTC's", () => {
   assert.equal(st.sofiaToday(Date.parse("2026-10-10T22:30:00Z")), "2026-10-11");
   assert.equal(st.sofiaToday(Date.parse("2026-10-10T20:59:00Z")), "2026-10-10");
 });
+
+test("selectMeets: upcoming soonest first, past most recent first, club filter applies", () => {
+  const now = Date.parse("2026-10-20T12:00:00+03:00");
+  const evs = [
+    { id: "old", club: "bmw", start: "2026-09-01T10:00:00+03:00", end: null },
+    { id: "recent", club: "general", start: "2026-10-18T09:30:00+03:00", end: "2026-10-18T13:00:00+03:00" },
+    { id: "live", club: "bmw", start: "2026-10-20T11:00:00+03:00", end: null },
+    { id: "later", club: "bmw", start: "2026-11-08T10:00:00+02:00", end: null },
+    { id: "soon", club: "general", start: "2026-10-25T10:00:00+02:00", end: null },
+  ];
+  const ids = (list) => list.map((e) => e.id);
+  assert.deepEqual(ids(meets.selectMeets(evs, { view: "upcoming", club: "all", now })), ["live", "soon", "later"]);
+  assert.deepEqual(ids(meets.selectMeets(evs, { view: "past", club: "all", now })), ["recent", "old"]);
+  assert.deepEqual(ids(meets.selectMeets(evs, { view: "past", club: "bmw", now })), ["old"]);
+  assert.deepEqual(ids(meets.selectMeets(evs, { view: "upcoming", club: "bmw", now })), ["live", "later"]);
+});
+
+test("parseListState: club and view from the hash, with safe defaults", () => {
+  const clubs = ["general", "bmw"];
+  assert.deepEqual(meets.parseListState("", clubs), { club: "all", view: "upcoming" });
+  assert.deepEqual(meets.parseListState("#club=bmw&view=past", clubs), { club: "bmw", view: "past" });
+  assert.deepEqual(meets.parseListState("#club=porsche&view=sideways", clubs), { club: "all", view: "upcoming" });
+  assert.equal(meets.listHash({ club: "bmw", view: "past" }), "#club=bmw&view=past");
+  assert.equal(meets.listHash({ club: "all", view: "upcoming" }), "#");
+});

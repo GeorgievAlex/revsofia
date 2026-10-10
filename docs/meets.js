@@ -113,3 +113,34 @@ export function meetsByDay(events) {
   }
   return byDay;
 }
+
+// List state lives in the URL hash ("#club=bmw&view=past") so views can be
+// linked and the back button works. Unknown values fall back to defaults.
+const VIEWS = ["upcoming", "past"];
+
+export function parseListState(hash, clubIds) {
+  const params = new URLSearchParams(String(hash || "").replace(/^#/, ""));
+  const club = params.get("club");
+  const view = params.get("view");
+  return {
+    club: clubIds.includes(club) ? club : "all",
+    view: VIEWS.includes(view) ? view : "upcoming",
+  };
+}
+
+export function listHash({ club, view }) {
+  const params = new URLSearchParams();
+  if (club !== "all") params.set("club", club);
+  if (view !== "upcoming") params.set("view", view);
+  const query = params.toString();
+  return `#${query}`;
+}
+
+// Upcoming: soonest first (a meet in progress still counts). Past: most recent first.
+export function selectMeets(events, { view, club, now }) {
+  const inClub = events.filter((ev) => club === "all" || ev.club === club);
+  if (view === "past") {
+    return inClub.filter((ev) => !isUpcoming(ev, now)).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
+  }
+  return inClub.filter((ev) => isUpcoming(ev, now)).sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+}
