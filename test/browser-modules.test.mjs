@@ -47,3 +47,20 @@ test("parseCarsText / carsToText round-trip", () => {
   assert.deepEqual(meets.parseCarsText(meets.carsToText(cars)), cars);
   assert.deepEqual(meets.parseCarsText("  \nNiki: W205: C200\n"), [{ who: "Niki", car: "W205: C200" }]);
 });
+
+test("validateDraft lists empty required fields", () => {
+  assert.deepEqual(meets.validateDraft({ title: "", start: null, meeting_point: "OMV" }), ["title", "start"]);
+  assert.deepEqual(meets.validateDraft({ title: "x", start: "2026-10-18T09:30:00+03:00", meeting_point: "OMV" }), []);
+});
+
+test("reviewIssueUrl carries the event JSON", () => {
+  const draft = { id: "2026-10-18-run", title: "Run", club: "bmw", start: "2026-10-18T09:30:00+03:00", end: null,
+    meeting_point: "OMV", destination: null, description: null, cars: [] };
+  const url = new URL(meets.reviewIssueUrl(draft));
+  assert.equal(url.origin + url.pathname, "https://github.com/GeorgievAlex/revsofia/issues/new");
+  assert.equal(url.searchParams.get("title"), "Meet: Run (2026-10-18)");
+  const body = url.searchParams.get("body");
+  const json = JSON.parse(body.split("```json\n")[1].split("\n```")[0]);
+  assert.deepEqual(json, draft);
+  assert.match(body, /data\/events\/2026-10-18-run\.json/);
+});

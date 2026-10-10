@@ -50,3 +50,23 @@ export function parseCarsText(text) {
 export function carsToText(cars) {
   return (cars || []).map((c) => (c.car ? `${c.who}: ${c.car}` : c.who)).join("\n");
 }
+
+export const REPO = "GeorgievAlex/revsofia";
+const REQUIRED = ["title", "start", "meeting_point"];
+
+export function validateDraft(draft) {
+  return REQUIRED.filter((key) => !draft[key]);
+}
+
+export function reviewIssueUrl(draft) {
+  const body = [
+    "A meet drafted with the RevSofia planner. Review it, then save the JSON below as",
+    `\`data/events/${draft.id}.json\` and run \`npm run build\`.`,
+    "",
+    "```json",
+    JSON.stringify(draft, null, 2),
+    "```",
+  ].join("\n");
+  const params = new URLSearchParams({ title: `Meet: ${draft.title} (${draft.start.slice(0, 10)})`, labels: "meet", body });
+  return `https://github.com/${REPO}/issues/new?${params}`;
+}
