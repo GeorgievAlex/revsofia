@@ -18,7 +18,7 @@ Built-in chat, news section, user accounts, a database, route planning or maps, 
 
 ```
 browser ── GitHub Pages (static: docs/)
-   │  POST text/plain {chat, club_hint, today}
+   │  POST text/plain {chat, club_hint}
    ▼
 DigitalOcean Function  revsofia/plan   (holds the model access key)
    │  OpenAI-compatible chat completion
@@ -67,7 +67,7 @@ test/*.test.mjs          # node:test
 
 ## Function contract
 
-Request (text/plain body, JSON): `{ "chat": string, "club_hint": "auto"|club id, "today": "YYYY-MM-DD" }`.
+Request (text/plain body, JSON): `{ "chat": string, "club_hint": "auto"|club id }`.
 
 Response 200:
 
@@ -84,7 +84,7 @@ Errors: `400` for bad input, with a message; `502` when inference fails or retur
 
 Behaviour:
 
-- The prompt passes today's date and weekday in the Europe/Sofia timezone, so "this Sunday" resolves.
+- The function computes today's date and weekday in Europe/Sofia itself (never trusting the client clock) and passes them in the prompt, so "this Sunday" resolves.
 - The model must return JSON only; the function strips code fences and parses it.
 - Validation runs through `scripts/lib/event.mjs`: club is clamped to known ids (else `general`), start must parse as a date, strings are trimmed and length-capped, `cars` is capped at 30.
 - When the model can't determine a field, it returns `null` and adds an open question; the UI shows that field empty and highlighted.
