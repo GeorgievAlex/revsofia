@@ -1,0 +1,17 @@
+# DigitalOcean Functions project. Deploy from the repo root:
+#   doctl serverless deploy .
+# DO_INFERENCE_KEY comes from ./.env (git-ignored), never from this file.
+environment: {}
+packages:
+  - name: revsofia
+    functions:
+      - name: plan
+        runtime: nodejs:18
+        web: raw
+        environment:
+          DO_INFERENCE_KEY: ${DO_INFERENCE_KEY}
+          MODEL: gemma-4-31B-it
+          ALLOWED_ORIGIN: https://georgievalex.github.io
+        limits:
+          timeout: 60000
+          memory: 256
