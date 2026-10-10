@@ -118,3 +118,7 @@ header.site nav a { white-space: nowrap; }
   .logo { width: 30px; height: 30px; }
   .wordmark { display: inline; }
 }
+/* Square cells suit phones; on wider screens they'd make the month huge. */
+@media (min-width: 641px) {
+  .cal-day { aspect-ratio: auto; height: 52px; }
+}

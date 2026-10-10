@@ -9,11 +9,11 @@ ai_disclosure_level: ai_assisted
 
 ## What I Built
 
-Every car meet I've been to in Sofia started the same way: a group chat.
+Car meets in Sofia almost always start the same way: a group chat.
 
 "Sunday?" "Can't before 10." "Bringing the E92." "Ring Mall parking like last time?" "Coffee after or just park and chat?" Forty messages later the meet is technically decided, but nobody can tell you when, where, or who's actually coming without scrolling back up and reading the whole thing again.
 
-<!-- TODO(Alex): one or two real sentences about your own meets / your E90 here. Keep it true. -->
+I'm based in Sofia, and my last DEV challenge entry was a repair assistant for a friend's BMW E90, which [won Best Use of DigitalOcean](https://dev.to/devteam/congrats-to-the-hacktoberfest-weekend-challenge-build-for-a-friend-winners-pgc). This one is about the step after the car's fixed: actually getting out and driving it with other people.
 
 So I built **[RevSofia](https://georgievalex.github.io/revsofia/)**, a meet board for Sofia car people:
 
@@ -22,6 +22,7 @@ So I built **[RevSofia](https://georgievalex.github.io/revsofia/)**, a meet boar
 - Every meet has an **Add to calendar** button, so the plan ends up on your phone and you end up on the road.
 - A month **calendar** behind a button in the top nav, with a dot per meet in the club's colour.
 - No chat built in. That happens on [our Discord](https://discord.gg/epUkNA99a), and every club page links there instead of pretending to replace it.
+- When a meet is approved, it's **posted to the Discord automatically**, with the time shown in each reader's own time zone.
 
 The part that makes it work is the **planner**. You paste the group chat, in English or Bulgarian, and an open-weight model (Gemma 4) turns it into a draft meet:
 
@@ -41,9 +42,17 @@ That's the touch grass part. The screen time is about thirty seconds. The rest i
 **Live site:** https://georgievalex.github.io/revsofia/
 **Planner:** https://georgievalex.github.io/revsofia/plan.html
 
-<!-- TODO(Alex): screenshot or GIF of the planner: paste chat, then the draft and the announcement. -->
+![The RevSofia meets page with the month calendar open](https://georgievalex.github.io/revsofia/media/meets-calendar.png)
 
-Here's a real chat I used for testing (it's in Bulgarian, which is how a lot of these actually look):
+Paste the chat, tick the "I'm human" box, hit **Draft the meet**:
+
+![The planner with a Bulgarian group chat pasted in](https://georgievalex.github.io/revsofia/media/planner-chat.png)
+
+And this is what came back from Gemma in one of my test runs (real output, recorded from the live function):
+
+![The draft meet and a Bulgarian Discord announcement generated from the chat](https://georgievalex.github.io/revsofia/media/planner-draft.png)
+
+Here's one of my test chats. I wrote it in Bulgarian, because that's how a lot of these threads actually look:
 
 ```
 Ники: Кой е за Витоша в неделя сутринта?
@@ -88,9 +97,10 @@ DigitalOcean Serverless Inference → gemma-4-31B-it
 - **One DigitalOcean Function does the AI part.** It exists so the model key never touches the browser. It caps the chat at 8,000 characters, never forwards upstream errors to the client, and runs the model's JSON through the same validation module the build uses. So a model hallucinating a club called "porsche" gets clamped to General instead of breaking anything.
 - **Gemma 4 runs on DigitalOcean Serverless Inference.** It's an OpenAI-compatible endpoint, so there's no GPU to babysit. The model is one line of config.
 - **The logo is hand-drawn SVG.** It's a rev gauge sweeping into the redline, with the Vitosha ridge underneath, because every Sofia meet ends up driving towards that mountain anyway. It's generated with a few lines of trig so the ticks and arcs land on exact angles.
+- **Approved meets announce themselves.** A GitHub Action watches `data/events/`. When a new meet file lands on `main`, it posts an embed to the club Discord through a webhook kept in Actions secrets. Mentions are switched off, so an `@everyone` hiding in someone's chat text can't ping the whole server. Example meets and meets that are already over never get posted.
 - **Time zones get their own tests.** Bulgaria switches from summer to winter time on 25 Oct. A meet at 10:00 that day is UTC+2, not UTC+3, and the calendar file has to say 08:00Z. There are tests for exactly that, because "the meet's an hour off" is the kind of bug that leaves people standing in an empty parking lot.
 
-51 tests, all `node:test`, no test framework either.
+57 tests, all `node:test`, no test framework either.
 
 ## What I got wrong on the way
 
@@ -108,8 +118,6 @@ The first real run against the live model taught me more than the unit tests did
 
 ## Why Does Open Innovation Matter?
 
-<!-- TODO(Alex): check these are things you actually believe; trim to the ones that land. -->
-
 - **It's people's private chat.** A club's group chat is full of names, plans, and sometimes where people live. With an open-weight model I pick where it runs. I'm not handing the chat to whichever closed API is cheapest this month.
 - **It costs almost nothing to run.** Gemma 4 on DigitalOcean is about $0.18 per million input tokens. A whole season of meets costs pocket change, and a club could run it without anyone paying a subscription.
 - **Swapping the model is a config change.** If a smaller open model handles Bulgarian slang better next month, I change one string. Nothing else in the project knows or cares which model answers.
@@ -120,4 +128,6 @@ The first real run against the live model taught me more than the unit tests did
 - **Best Use of DigitalOcean:** a DigitalOcean Function hosts the backend, and DigitalOcean Serverless Inference serves the open-weight model. The spend ceiling is the prepaid Inference balance with auto-reload off.
 - **Best Use of Gemma:** `gemma-4-31B-it` does the actual work of reading a messy multi-person chat and turning it into a structured, dated, located meet, in two languages.
 
-<!-- TODO(Alex): if you take it to a real meet this weekend (bonus points: "take it outside, use it, and tell us how it went"), add a short section here with what happened. -->
+## What's next
+
+The four meets on the board are examples. The next step is replacing them with real ones from our Discord and seeing how Gemma handles a proper 200-message thread, slang, typos and all. After that: suggesting a route for the drive, and a small news section for each club.
