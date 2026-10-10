@@ -1,0 +1,33 @@
+{
+  "status": 200,
+  "ms": 4767,
+  "body": {
+    "event": {
+      "title": "Sunday run to Vitosha",
+      "club": "general",
+      "start": "2026-10-11T09:30:00+03:00",
+      "end": null,
+      "meeting_point": "бензиностанцията на Симеоновско шосе",
+      "destination": "Златните мостове",
+      "description": "Сутринно каране до Витоша с кафе на Златните мостове.",
+      "cars": [
+        {
+          "who": "Ники",
+          "car": ""
+        },
+        {
+          "who": "Мария",
+          "car": "Golf"
+        },
+        {
+          "who": "Иво",
+          "car": "BMW 335i"
+        }
+      ]
+    },
+    "missing": [],
+    "club_reason": "The participants drive different brands (BMW and VW).",
+    "open_questions": [],
+    "announcement": "📅 Неделя, 11 Октомври\n⏰ 09:30 ч.\n📍 Сбиране: Бензиностанцията на Симеоновско шосе\n🏁 Дестинация: Златните мостове\nВидим се там!"
+  }
+}

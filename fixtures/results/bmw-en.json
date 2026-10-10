@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "ms": 5143,
+  "body": {
+    "event": {
+      "title": "Sunday E-series Meet",
+      "club": "bmw",
+      "start": "2026-10-11T10:30:00+03:00",
+      "end": null,
+      "meeting_point": "Ring Mall parking south side",
+      "destination": null,
+      "description": "A gathering for BMW E-series owners to meet and chat.",
+      "cars": [
+        {
+          "who": "Stoyan",
+          "car": "E-series"
+        },
+        {
+          "who": "Ivo",
+          "car": "E92"
+        },
+        {
+          "who": "Alex",
+          "car": "E90"
+        }
+      ]
+    },
+    "missing": [],
+    "club_reason": "All participants are driving BMW E-series models.",
+    "open_questions": [
+      "Will there be a coffee stop after the meet or just parking and chatting?"
+    ],
+    "announcement": "BMW E-series Meet!\nDate: Sunday, Oct 11\nTime: 10:30\nMeeting Point: Ring Mall parking south side\nDestination: TBC\nCome join us for a park and chat!"
+  }
+}

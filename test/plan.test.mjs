@@ -105,3 +105,21 @@ test("main: decodes a base64 raw body", async () => {
   assert.match(JSON.parse(res.body).error, /Paste a chat first/);
   delete process.env.DO_INFERENCE_KEY;
 });
+
+test("buildMessages: gives the current Sofia time and picks the announcement language", () => {
+  const evening = Date.parse("2026-10-10T18:40:00Z"); // 21:40 in Sofia
+  const en = plan.buildMessages("Maria: drive saturday morning?", null, evening)[1].content;
+  assert.match(en, /Today is Saturday, 2026-10-10 \(Europe\/Sofia\), and the time now is 21:40\./);
+  assert.match(en, /Write the announcement in English\./);
+  const bg = plan.buildMessages("Ники: Кой е за Витоша в неделя? ok", null, evening)[1].content;
+  assert.match(bg, /Write the announcement in Bulgarian\./);
+});
+
+test("handle: a start that is already in the past is flagged, not silently accepted", async () => {
+  const evening = Date.parse("2026-10-10T18:40:00Z");
+  const f = fakeFetch(JSON.stringify({ ...draft, start: "2026-10-10T09:30" }));
+  const res = await plan.handle(req({ chat: "x" }), { env, fetchImpl: f, now: evening });
+  assert.equal(res.status, 200);
+  assert.ok(res.body.missing.includes("start"));
+  assert.match(res.body.open_questions[0], /already passed/);
+});

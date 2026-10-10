@@ -2,9 +2,12 @@
   "name": "revsofia",
   "private": true,
   "description": "Sofia car meets, with an open-weight AI that turns a group chat into a meet",
+  "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

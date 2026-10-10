@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "ms": 7023,
+  "body": {
+    "event": {
+      "title": "Saturday foliage drive to Plana",
+      "club": "general",
+      "start": "2026-10-17T09:30:00+03:00",
+      "end": null,
+      "meeting_point": "Boyana church parking",
+      "destination": "Plana",
+      "description": "A foliage drive to Plana via the Samokov road.",
+      "cars": [
+        {
+          "who": "Niki",
+          "car": "W205"
+        },
+        {
+          "who": "Petya",
+          "car": "A4"
+        },
+        {
+          "who": "Maria",
+          "car": ""
+        }
+      ]
+    },
+    "missing": [],
+    "club_reason": "The group consists of mixed brands including Mercedes and Audi.",
+    "open_questions": [
+      "Does 9:30 work for Ivo?"
+    ],
+    "announcement": "🚗 Foliage Drive to Plana!\n📅 Date: Saturday, Oct 17\n⏰ Time: 09:30\n📍 Meeting Point: Boyana church parking\n🏁 Destination: Plana"
+  }
+}
