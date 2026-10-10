@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//RevSofia//Meets//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:2026-10-18-vitosha-sunday-run@revsofia
+DTSTAMP:20261018T063000Z
+DTSTART:20261018T063000Z
+DTEND:20261018T100000Z
+SUMMARY:Sunday run to Zlatnite Mostove
+LOCATION:Petrol station on Simeonovsko shose\, by the Vitosha turn-off
+DESCRIPTION:Easy pace up the mountain road\, coffee at the top\, back by lu
+ nch. Any car welcome.\n\nDestination: Zlatnite Mostove\, Vitosha\n\nhttps:
+ //georgievalex.github.io/revsofia/
+URL:https://georgievalex.github.io/revsofia/
+END:VEVENT
+END:VCALENDAR

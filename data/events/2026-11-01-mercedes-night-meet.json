@@ -1,0 +1,12 @@
+{
+  "id": "2026-11-01-mercedes-night-meet",
+  "title": "Mercedes night meet",
+  "club": "mercedes",
+  "start": "2026-11-01T19:00:00+02:00",
+  "end": null,
+  "meeting_point": "Business Park Sofia, parking P2",
+  "destination": null,
+  "description": "Photos under the lights, then a short drive through the city.",
+  "cars": [{ "who": "Georgi", "car": "W124 E220" }],
+  "example": true
+}

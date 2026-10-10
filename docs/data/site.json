@@ -1,0 +1,122 @@
+{
+  "clubs": [
+    {
+      "id": "general",
+      "name": "General meets",
+      "short": "General",
+      "blurb": "Open to every car and every brand. Bring whatever you drive.",
+      "accent": "#f2a541",
+      "discord_url": ""
+    },
+    {
+      "id": "bmw",
+      "name": "BMW Club Sofia",
+      "short": "BMW",
+      "blurb": "E30s to G80s, daily drivers to track builds.",
+      "accent": "#3b82f6",
+      "discord_url": ""
+    },
+    {
+      "id": "mercedes",
+      "name": "Mercedes-Benz Club Sofia",
+      "short": "Mercedes",
+      "blurb": "From W124 classics to AMG.",
+      "accent": "#a3b1bd",
+      "discord_url": ""
+    },
+    {
+      "id": "audi-vag",
+      "name": "Audi / VW Group Club Sofia",
+      "short": "Audi/VAG",
+      "blurb": "Audi, VW, Skoda, Seat, Cupra and Porsche.",
+      "accent": "#e5484d",
+      "discord_url": ""
+    }
+  ],
+  "events": [
+    {
+      "id": "2026-10-18-vitosha-sunday-run",
+      "title": "Sunday run to Zlatnite Mostove",
+      "club": "general",
+      "start": "2026-10-18T09:30:00+03:00",
+      "end": "2026-10-18T13:00:00+03:00",
+      "meeting_point": "Petrol station on Simeonovsko shose, by the Vitosha turn-off",
+      "destination": "Zlatnite Mostove, Vitosha",
+      "description": "Easy pace up the mountain road, coffee at the top, back by lunch. Any car welcome.",
+      "cars": [
+        {
+          "who": "Ivo",
+          "car": "BMW E92 335i"
+        },
+        {
+          "who": "Maria",
+          "car": "VW Golf 7 GTI"
+        },
+        {
+          "who": "Niki",
+          "car": "Mercedes C200 W205"
+        }
+      ],
+      "example": true
+    },
+    {
+      "id": "2026-10-25-bmw-coffee-and-cars",
+      "title": "BMW coffee and cars",
+      "club": "bmw",
+      "start": "2026-10-25T10:00:00+02:00",
+      "end": "2026-10-25T12:30:00+02:00",
+      "meeting_point": "Ring Mall parking, south side",
+      "destination": null,
+      "description": "Static meet. Clocks go back the night before, so it's an extra hour of sleep.",
+      "cars": [
+        {
+          "who": "Alex",
+          "car": "E90 325i"
+        },
+        {
+          "who": "Stoyan",
+          "car": "E46 330Ci"
+        }
+      ],
+      "example": true
+    },
+    {
+      "id": "2026-11-01-mercedes-night-meet",
+      "title": "Mercedes night meet",
+      "club": "mercedes",
+      "start": "2026-11-01T19:00:00+02:00",
+      "end": null,
+      "meeting_point": "Business Park Sofia, parking P2",
+      "destination": null,
+      "description": "Photos under the lights, then a short drive through the city.",
+      "cars": [
+        {
+          "who": "Georgi",
+          "car": "W124 E220"
+        }
+      ],
+      "example": true
+    },
+    {
+      "id": "2026-11-08-vag-autumn-drive",
+      "title": "Autumn drive to Plana",
+      "club": "audi-vag",
+      "start": "2026-11-08T10:00:00+02:00",
+      "end": "2026-11-08T14:00:00+02:00",
+      "meeting_point": "Boyana, parking by the Boyana Church",
+      "destination": "Plana, via the Samokov road",
+      "description": "Foliage drive, regroup at Plana for lunch.",
+      "cars": [
+        {
+          "who": "Petya",
+          "car": "Audi A4 B8 Avant"
+        },
+        {
+          "who": "Kris",
+          "car": "Skoda Octavia RS"
+        }
+      ],
+      "example": true
+    }
+  ]
+}

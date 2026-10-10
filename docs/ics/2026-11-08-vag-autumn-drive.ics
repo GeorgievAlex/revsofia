@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//RevSofia//Meets//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:2026-11-08-vag-autumn-drive@revsofia
+DTSTAMP:20261108T080000Z
+DTSTART:20261108T080000Z
+DTEND:20261108T120000Z
+SUMMARY:Autumn drive to Plana
+LOCATION:Boyana\, parking by the Boyana Church
+DESCRIPTION:Foliage drive\, regroup at Plana for lunch.\n\nDestination: Pla
+ na\, via the Samokov road\n\nhttps://georgievalex.github.io/revsofia/
+URL:https://georgievalex.github.io/revsofia/
+END:VEVENT
+END:VCALENDAR

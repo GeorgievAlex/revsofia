@@ -1,0 +1,12 @@
+{
+  "id": "2026-11-08-vag-autumn-drive",
+  "title": "Autumn drive to Plana",
+  "club": "audi-vag",
+  "start": "2026-11-08T10:00:00+02:00",
+  "end": "2026-11-08T14:00:00+02:00",
+  "meeting_point": "Boyana, parking by the Boyana Church",
+  "destination": "Plana, via the Samokov road",
+  "description": "Foliage drive, regroup at Plana for lunch.",
+  "cars": [{ "who": "Petya", "car": "Audi A4 B8 Avant" }, { "who": "Kris", "car": "Skoda Octavia RS" }],
+  "example": true
+}

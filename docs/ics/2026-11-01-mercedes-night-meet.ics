@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//RevSofia//Meets//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:2026-11-01-mercedes-night-meet@revsofia
+DTSTAMP:20261101T170000Z
+DTSTART:20261101T170000Z
+DTEND:20261101T200000Z
+SUMMARY:Mercedes night meet
+LOCATION:Business Park Sofia\, parking P2
+DESCRIPTION:Photos under the lights\, then a short drive through the city.\
+ n\nhttps://georgievalex.github.io/revsofia/
+URL:https://georgievalex.github.io/revsofia/
+END:VEVENT
+END:VCALENDAR

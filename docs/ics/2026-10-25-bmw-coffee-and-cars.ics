@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//RevSofia//Meets//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:2026-10-25-bmw-coffee-and-cars@revsofia
+DTSTAMP:20261025T080000Z
+DTSTART:20261025T080000Z
+DTEND:20261025T103000Z
+SUMMARY:BMW coffee and cars
+LOCATION:Ring Mall parking\, south side
+DESCRIPTION:Static meet. Clocks go back the night before\, so it's an extra
+  hour of sleep.\n\nhttps://georgievalex.github.io/revsofia/
+URL:https://georgievalex.github.io/revsofia/
+END:VEVENT
+END:VCALENDAR

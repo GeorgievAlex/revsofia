@@ -1,0 +1,12 @@
+{
+  "id": "2026-10-18-vitosha-sunday-run",
+  "title": "Sunday run to Zlatnite Mostove",
+  "club": "general",
+  "start": "2026-10-18T09:30:00+03:00",
+  "end": "2026-10-18T13:00:00+03:00",
+  "meeting_point": "Petrol station on Simeonovsko shose, by the Vitosha turn-off",
+  "destination": "Zlatnite Mostove, Vitosha",
+  "description": "Easy pace up the mountain road, coffee at the top, back by lunch. Any car welcome.",
+  "cars": [{ "who": "Ivo", "car": "BMW E92 335i" }, { "who": "Maria", "car": "VW Golf 7 GTI" }, { "who": "Niki", "car": "Mercedes C200 W205" }],
+  "example": true
+}
