@@ -157,6 +157,18 @@ function render() {
   meetsEl.replaceChildren(...items.map((ev) => meetCard(ev, clubsById)));
 }
 
+// The calendar stays out of the way until asked for, from the nav button or
+// a link like ./?calendar from the other pages.
+const calendarToggle = document.getElementById("calendar-toggle");
+
+function setCalendarOpen(open) {
+  calendarEl.hidden = !open;
+  calendarToggle.setAttribute("aria-expanded", String(open));
+  if (open) calendarEl.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+calendarToggle.addEventListener("click", () => setCalendarOpen(calendarEl.hidden));
+
 async function start() {
   try {
     const res = await fetch("data/site.json");
@@ -168,6 +180,7 @@ async function start() {
   }
   render();
   addEventListener("hashchange", render);
+  if (new URLSearchParams(location.search).has("calendar")) setCalendarOpen(true);
 }
 
 start();

@@ -78,3 +78,20 @@ header.site nav a { white-space: nowrap; }
 .meet.flash { animation: flash 1.4s ease-out; }
 @keyframes flash { from { box-shadow: 0 0 0 3px var(--accent); } to { box-shadow: 0 0 0 0 transparent; } }
 @media (prefers-reduced-motion: reduce) { .meet.flash { animation: none; } }
+.nav-button { background: none; border: 0; padding: 0; font: inherit; color: var(--muted); cursor: pointer; }
+.nav-button:hover, header.site nav a:hover { color: var(--text); }
+.nav-button[aria-expanded="true"] { color: var(--text); font-weight: 600; }
+@media (max-width: 480px) {
+  .theme-toggle { font-size: 0; padding: 3px 7px; }
+  .theme-toggle::first-letter { font-size: 0.95rem; }
+}
+@media (max-width: 400px) {
+  header.site { gap: 8px; padding-left: 12px; padding-right: 12px; }
+  header.site nav { gap: 9px; font-size: 0.88rem; }
+  .brand { font-size: 1.05rem; gap: 5px; }
+  .logo { width: 26px; height: 26px; }
+}
+@media (max-width: 350px) {
+  .wordmark { display: none; }
+  .logo { width: 30px; height: 30px; }
+}
