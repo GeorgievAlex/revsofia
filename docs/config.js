@@ -4,4 +4,4 @@ export const FUNCTION_URL = "https://faas-fra1-afec6ce7.doserverless.co/api/v1/w
 
 // Cloudflare Turnstile site key (public). Empty disables the planner's
 // Generate button, because the function refuses requests without a token.
-export const TURNSTILE_SITEKEY = "";
+export const TURNSTILE_SITEKEY = "0x4AAAAAAFTTvAkEfQ5qFUZe";
