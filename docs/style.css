@@ -3,9 +3,7 @@
   --brand: #f2a541; --accent: var(--brand); --radius: 12px;
   color-scheme: dark;
 }
-@media (prefers-color-scheme: light) {
-  :root { --bg: #f6f5f2; --surface: #ffffff; --line: #e2e0da; --text: #1a1a1a; --muted: #5f5f5f; color-scheme: light; }
-}
+:root[data-theme="light"] { --bg: #f6f5f2; --surface: #ffffff; --line: #e2e0da; --text: #1a1a1a; --muted: #5f5f5f; color-scheme: light; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
 a { color: inherit; }
@@ -50,3 +48,6 @@ textarea { min-height: 120px; resize: vertical; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin: 16px 0; }
 .status { min-height: 1.5em; color: var(--muted); }
 .status.error { color: #e5484d; }
+.theme-toggle { background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 0.85rem; cursor: pointer; }
+.theme-toggle:hover { color: var(--text); }
+header.site nav { align-items: center; }
