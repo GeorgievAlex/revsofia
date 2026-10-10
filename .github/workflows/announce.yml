@@ -1,0 +1,55 @@
+name: Announce new meets on Discord
+
+on:
+  push:
+    branches: [main]
+    paths: ["data/events/*.json"]
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "Meet file to announce, e.g. data/events/2026-10-18-vitosha-sunday-run.json"
+        required: true
+      force:
+        description: "Announce even if it's an example or already over (for testing)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency: announce
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Find newly added meets
+        id: files
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          INPUT_FILE: ${{ inputs.file }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            files="$INPUT_FILE"
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            files=$(git diff --diff-filter=A --name-only HEAD~1 HEAD -- 'data/events/*.json')
+          else
+            files=$(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- 'data/events/*.json')
+          fi
+          echo "Meets to announce: ${files:-none}"
+          { echo "files<<EOF"; echo "$files"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+      - name: Post to Discord
+        if: steps.files.outputs.files != ''
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          FILES: ${{ steps.files.outputs.files }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+        run: node scripts/announce.mjs $FORCE $FILES
