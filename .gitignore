@@ -5,3 +5,6 @@ node_modules/
 .claude-flow/
 .swarm/
 .playwright-mcp/
+__deployer__.zip
+packages/revsofia/plan/package-lock.json
+ruvector.db
