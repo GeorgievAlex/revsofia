@@ -4,7 +4,7 @@
   "description": "Sofia car meets, with an open-weight AI that turns a group chat into a meet",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test test/"
+    "test": "node --test"
   },
   "engines": { "node": ">=18" }
 }
