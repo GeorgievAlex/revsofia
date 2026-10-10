@@ -8,6 +8,10 @@ packages:
       - name: plan
         runtime: nodejs:18
         web: raw
+        # Without this DO's gateway adds its own "Access-Control-Allow-Origin: *"
+        # on top of the function's, and browsers reject the doubled header.
+        annotations:
+          web-custom-options: true
         environment:
           DO_INFERENCE_KEY: ${DO_INFERENCE_KEY}
           MODEL: gemma-4-31B-it
