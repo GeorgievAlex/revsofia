@@ -9,8 +9,8 @@ body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 syst
 a { color: inherit; }
 main, header.site, footer.site { max-width: 760px; margin: 0 auto; padding: 0 16px; }
 header.site { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 20px; padding-bottom: 20px; }
-.brand { font-weight: 800; font-size: 1.35rem; text-decoration: none; letter-spacing: -0.02em; }
-.brand span { color: var(--brand); }
+.brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.35rem; text-decoration: none; letter-spacing: -0.02em; }
+.wordmark span { color: var(--brand); }
 header.site nav { display: flex; gap: 16px; }
 header.site nav a { text-decoration: none; color: var(--muted); }
 header.site nav a[aria-current="page"] { color: var(--text); font-weight: 600; }
@@ -52,3 +52,12 @@ textarea { min-height: 120px; resize: vertical; }
 .theme-toggle:hover { color: var(--text); }
 header.site nav { align-items: center; }
 .turnstile { margin-top: 14px; min-height: 65px; }
+.logo { width: 34px; height: 34px; color: var(--text); flex: none; }
+header.site nav a { white-space: nowrap; }
+@media (max-width: 480px) {
+  header.site { gap: 10px; }
+  header.site nav { gap: 12px; font-size: 0.92rem; }
+  .logo { width: 28px; height: 28px; }
+  .brand { font-size: 1.15rem; gap: 6px; }
+  .theme-toggle { padding: 3px 8px; }
+}

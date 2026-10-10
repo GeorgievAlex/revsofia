@@ -1,6 +1,6 @@
 [
-  { "id": "general", "name": "General meets", "short": "General", "blurb": "Open to every car and every brand. Bring whatever you drive.", "accent": "#f2a541", "discord_url": "" },
-  { "id": "bmw", "name": "BMW Club Sofia", "short": "BMW", "blurb": "E30s to G80s, daily drivers to track builds.", "accent": "#3b82f6", "discord_url": "" },
-  { "id": "mercedes", "name": "Mercedes-Benz Club Sofia", "short": "Mercedes", "blurb": "From W124 classics to AMG.", "accent": "#a3b1bd", "discord_url": "" },
-  { "id": "audi-vag", "name": "Audi / VW Group Club Sofia", "short": "Audi/VAG", "blurb": "Audi, VW, Skoda, Seat, Cupra and Porsche.", "accent": "#e5484d", "discord_url": "" }
+  {"id": "general", "name": "General meets", "short": "General", "blurb": "Open to every car and every brand. Bring whatever you drive.", "accent": "#f2a541", "discord_url": "https://discord.gg/epUkNA99a"},
+  {"id": "bmw", "name": "BMW Club Sofia", "short": "BMW", "blurb": "E30s to G80s, daily drivers to track builds.", "accent": "#3b82f6", "discord_url": "https://discord.gg/epUkNA99a"},
+  {"id": "mercedes", "name": "Mercedes-Benz Club Sofia", "short": "Mercedes", "blurb": "From W124 classics to AMG.", "accent": "#a3b1bd", "discord_url": "https://discord.gg/epUkNA99a"},
+  {"id": "audi-vag", "name": "Audi / VW Group Club Sofia", "short": "Audi/VAG", "blurb": "Audi, VW, Skoda, Seat, Cupra and Porsche.", "accent": "#e5484d", "discord_url": "https://discord.gg/epUkNA99a"}
 ]
