@@ -56,3 +56,10 @@ export function toLocalInputValue(iso) {
 export function formatWhen(iso) {
   return whenFormat.format(new Date(iso));
 }
+
+const dateFormat = new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" });
+
+// Today's date in Sofia as "YYYY-MM-DD", whatever the viewer's own time zone.
+export function sofiaToday(now = Date.now()) {
+  return dateFormat.format(new Date(now));
+}

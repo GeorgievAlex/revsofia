@@ -61,3 +61,20 @@ header.site nav a { white-space: nowrap; }
   .brand { font-size: 1.15rem; gap: 6px; }
   .theme-toggle { padding: 3px 8px; }
 }
+.calendar { padding: 12px 12px 14px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head h2 { margin: 0; font-size: 1.05rem; }
+.cal-nav { background: transparent; border: 1px solid var(--line); color: var(--text); width: 36px; height: 36px; border-radius: 8px; font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.cal-nav:hover { border-color: var(--brand); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-weekday { text-align: center; font-size: 0.75rem; color: var(--muted); padding: 2px 0 4px; }
+.cal-day { aspect-ratio: 1 / 1; min-height: 36px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 8px; font-size: 0.9rem; border: 1px solid transparent; background: transparent; color: var(--text); font: inherit; padding: 0; }
+.cal-day.outside, .cal-day.past { color: var(--muted); opacity: 0.55; }
+.cal-day.today { border-color: var(--brand); font-weight: 700; opacity: 1; }
+.cal-day.has-meet { cursor: pointer; background: color-mix(in srgb, var(--brand) 10%, transparent); font-weight: 600; }
+.cal-day.has-meet:hover { border-color: var(--line); }
+.dots { display: flex; gap: 3px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.meet.flash { animation: flash 1.4s ease-out; }
+@keyframes flash { from { box-shadow: 0 0 0 3px var(--accent); } to { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .meet.flash { animation: none; } }

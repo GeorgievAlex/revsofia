@@ -83,3 +83,36 @@ test("reviewIssueLink falls back to pasting when the URL would be too long", () 
   assert.ok(long.url.length <= meets.MAX_ISSUE_URL_LENGTH);
   assert.match(new URL(long.url).searchParams.get("body"), /paste/i);
 });
+
+test("monthGrid: Monday-first weeks covering the whole month", () => {
+  const oct = meets.monthGrid(2026, 10);
+  assert.equal(oct.length, 5);
+  assert.ok(oct.every((w) => w.length === 7));
+  assert.deepEqual(oct[0][0], { date: "2026-09-28", day: 28, inMonth: false });
+  assert.deepEqual(oct[0][3], { date: "2026-10-01", day: 1, inMonth: true });
+  assert.deepEqual(oct[4][6], { date: "2026-11-01", day: 1, inMonth: false });
+  const feb = meets.monthGrid(2026, 2); // starts on a Sunday
+  assert.equal(feb[0][6].date, "2026-02-01");
+  assert.equal(feb.at(-1).at(-1).date, "2026-03-01");
+});
+
+test("addMonths wraps years both ways", () => {
+  assert.deepEqual(meets.addMonths(2026, 12, 1), { year: 2027, month: 1 });
+  assert.deepEqual(meets.addMonths(2026, 1, -1), { year: 2025, month: 12 });
+});
+
+test("meetsByDay groups by the Sofia date of the start, including the DST day", () => {
+  const evs = [
+    { id: "a", start: "2026-10-25T10:00:00+02:00" },
+    { id: "b", start: "2026-10-25T23:30:00+02:00" },
+    { id: "c", start: "2026-10-18T09:30:00+03:00" },
+  ];
+  const byDay = meets.meetsByDay(evs);
+  assert.deepEqual(byDay.get("2026-10-25").map((e) => e.id), ["a", "b"]);
+  assert.deepEqual(byDay.get("2026-10-18").map((e) => e.id), ["c"]);
+});
+
+test("sofiaToday uses Sofia's date, not UTC's", () => {
+  assert.equal(st.sofiaToday(Date.parse("2026-10-10T22:30:00Z")), "2026-10-11");
+  assert.equal(st.sofiaToday(Date.parse("2026-10-10T20:59:00Z")), "2026-10-10");
+});

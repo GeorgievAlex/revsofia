@@ -76,3 +76,40 @@ export function reviewIssueLink(draft) {
   const short = issueUrl(`${intro}\n\nThe planner copied the meet JSON to your clipboard. Paste it below in a json code block.\n\n`);
   return { url: short, json, pasteJson: true };
 }
+
+// Calendar helpers. Dates are plain "YYYY-MM-DD" strings in Sofia time, and
+// the arithmetic runs in UTC so the viewer's own time zone never shifts a day.
+const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+
+export function addMonths(year, month, delta) {
+  const index = year * 12 + (month - 1) + delta;
+  return { year: Math.floor(index / 12), month: (index % 12) + 1 };
+}
+
+// Weeks start on Monday, as calendars do in Bulgaria.
+export function monthGrid(year, month) {
+  const first = Date.UTC(year, month - 1, 1);
+  const lead = (new Date(first).getUTCDay() + 6) % 7;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const cells = Math.ceil((lead + daysInMonth) / 7) * 7;
+  const weeks = [];
+  for (let i = 0; i < cells; i++) {
+    const ms = first + (i - lead) * 86400000;
+    const d = new Date(ms);
+    if (i % 7 === 0) weeks.push([]);
+    weeks.at(-1).push({ date: isoDay(ms), day: d.getUTCDate(), inMonth: d.getUTCMonth() === month - 1 });
+  }
+  return weeks;
+}
+
+// Stored starts are always Sofia wall time, so the first 10 characters are
+// the Sofia date.
+export function meetsByDay(events) {
+  const byDay = new Map();
+  for (const ev of events) {
+    const key = ev.start.slice(0, 10);
+    if (!byDay.has(key)) byDay.set(key, []);
+    byDay.get(key).push(ev);
+  }
+  return byDay;
+}

@@ -1,10 +1,65 @@
-import { formatWhen } from "./sofia-time.js";
-import { isUpcoming, googleCalendarUrl } from "./meets.js";
+import { formatWhen, sofiaToday } from "./sofia-time.js";
+import { isUpcoming, googleCalendarUrl, monthGrid, addMonths, meetsByDay } from "./meets.js";
 
 const chipsEl = document.getElementById("chips");
 const headerEl = document.getElementById("club-header");
 const meetsEl = document.getElementById("meets");
+const calendarEl = document.getElementById("calendar");
 let site = null;
+const todayKey = sofiaToday();
+let shown = { year: Number(todayKey.slice(0, 4)), month: Number(todayKey.slice(5, 7)) };
+const monthName = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+const dayLabel = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+
+function openMeet(id) {
+  const card = document.getElementById(`meet-${id}`);
+  if (!card) return;
+  card.querySelector("details").open = true;
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  card.classList.remove("flash");
+  void card.offsetWidth; // restart the highlight animation
+  card.classList.add("flash");
+}
+
+function renderCalendar(items, clubsById) {
+  const byDay = meetsByDay(items);
+  const nav = (label, delta, text) =>
+    el("button", { class: "cal-nav", type: "button", "aria-label": label, text, "data-delta": String(delta) });
+  const head = el(
+    "div",
+    { class: "cal-head" },
+    nav("Previous month", -1, "‹"),
+    el("h2", { text: monthName.format(new Date(Date.UTC(shown.year, shown.month - 1, 1))) }),
+    nav("Next month", 1, "›"),
+  );
+  const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => el("div", { class: "cal-weekday", "aria-hidden": "true", text: d }));
+  const cells = monthGrid(shown.year, shown.month).flat().map((cell) => {
+    const dayMeets = byDay.get(cell.date) || [];
+    const classes = ["cal-day", cell.inMonth ? "" : "outside", cell.date === todayKey ? "today" : "", cell.date < todayKey ? "past" : ""]
+      .filter(Boolean)
+      .join(" ");
+    if (!dayMeets.length) return el("div", { class: classes, text: String(cell.day) });
+    const label = `${dayLabel.format(new Date(cell.date + "T00:00:00Z"))}: ${dayMeets.map((m) => m.title).join(", ")}`;
+    return el(
+      "button",
+      { class: `${classes} has-meet`, type: "button", "aria-label": label, title: label, "data-meet": dayMeets[0].id },
+      el("span", { text: String(cell.day) }),
+      el("span", { class: "dots" }, ...dayMeets.map((m) => el("i", { style: `--accent:${clubsById[m.club].accent}` }))),
+    );
+  });
+  calendarEl.replaceChildren(head, el("div", { class: "cal-grid" }, ...weekdays, ...cells));
+}
+
+calendarEl.addEventListener("click", (event) => {
+  const target = event.target.closest("button");
+  if (!target) return;
+  if (target.dataset.delta) {
+    shown = addMonths(shown.year, shown.month, Number(target.dataset.delta));
+    render();
+  } else if (target.dataset.meet) {
+    openMeet(target.dataset.meet);
+  }
+});
 
 function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
@@ -92,6 +147,7 @@ function render() {
   renderClubHeader(clubsById[current]);
   const now = Date.now();
   const items = site.events.filter((ev) => isUpcoming(ev, now) && (current === "all" || ev.club === current));
+  renderCalendar(items, clubsById);
   if (!items.length) {
     meetsEl.replaceChildren(
       el("p", { class: "empty" }, "No upcoming meets here yet. ", el("a", { href: "plan.html", text: "Plan one from your group chat" }), "."),
