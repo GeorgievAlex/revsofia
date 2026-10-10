@@ -32,11 +32,17 @@ const dateFormat = new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year:
 const timeFormat = new Intl.DateTimeFormat("en-GB", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 
 // Decided here, not by the model: in testing Gemma answered an English chat
-// in Bulgarian. More Cyrillic than Latin letters means Bulgarian.
+// in Bulgarian. Usernames, links and car models are Latin even in Bulgarian
+// chats, so they're stripped first, and a meaningful share of Cyrillic in
+// the remaining words is enough to call it Bulgarian.
 function announcementLanguage(chat) {
-  const cyrillic = (chat.match(/[\u0400-\u04FF]/g) || []).length;
-  const latin = (chat.match(/[A-Za-z]/g) || []).length;
-  return cyrillic > latin ? "Bulgarian" : "English";
+  const prose = chat
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/^[^\n:]{1,40}:\s/gm, " ");
+  const words = prose.match(/[A-Za-z\u0400-\u04FF]{3,}/g) || [];
+  const letters = words.join("");
+  const cyrillic = (letters.match(/[\u0400-\u04FF]/g) || []).length;
+  return letters.length && cyrillic / letters.length >= 0.3 ? "Bulgarian" : "English";
 }
 
 function buildMessages(chat, clubHint, now) {

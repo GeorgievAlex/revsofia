@@ -53,14 +53,33 @@ test("validateDraft lists empty required fields", () => {
   assert.deepEqual(meets.validateDraft({ title: "x", start: "2026-10-18T09:30:00+03:00", meeting_point: "OMV" }), []);
 });
 
-test("reviewIssueUrl carries the event JSON", () => {
+test("reviewIssueLink carries the event JSON", () => {
   const draft = { id: "2026-10-18-run", title: "Run", club: "bmw", start: "2026-10-18T09:30:00+03:00", end: null,
     meeting_point: "OMV", destination: null, description: null, cars: [] };
-  const url = new URL(meets.reviewIssueUrl(draft));
+  const url = new URL(meets.reviewIssueLink(draft).url);
   assert.equal(url.origin + url.pathname, "https://github.com/GeorgievAlex/revsofia/issues/new");
   assert.equal(url.searchParams.get("title"), "Meet: Run (2026-10-18)");
   const body = url.searchParams.get("body");
   const json = JSON.parse(body.split("```json\n")[1].split("\n```")[0]);
   assert.deepEqual(json, draft);
   assert.match(body, /data\/events\/2026-10-18-run\.json/);
+});
+
+test("validateDraft rejects a start that has already passed", () => {
+  const now = Date.parse("2026-10-10T15:00:00Z");
+  const d = { title: "x", meeting_point: "OMV" };
+  assert.deepEqual(meets.validateDraft({ ...d, start: "2026-10-10T10:00:00+03:00" }, now), ["start"]);
+  assert.deepEqual(meets.validateDraft({ ...d, start: "2026-10-11T10:00:00+03:00" }, now), []);
+});
+
+test("reviewIssueLink falls back to pasting when the URL would be too long", () => {
+  const base = { id: "2026-10-18-meet", title: "Неделна разходка", club: "general", start: "2026-10-18T09:30:00+03:00",
+    end: null, meeting_point: "Симеоновско шосе", destination: null, cars: [] };
+  const short = meets.reviewIssueLink({ ...base, description: "кратко" });
+  assert.equal(short.pasteJson, false);
+  assert.match(new URL(short.url).searchParams.get("body"), /```json/);
+  const long = meets.reviewIssueLink({ ...base, description: "дълго описание ".repeat(140) });
+  assert.equal(long.pasteJson, true);
+  assert.ok(long.url.length <= meets.MAX_ISSUE_URL_LENGTH);
+  assert.match(new URL(long.url).searchParams.get("body"), /paste/i);
 });

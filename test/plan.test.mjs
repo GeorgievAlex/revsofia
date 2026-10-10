@@ -123,3 +123,13 @@ test("handle: a start that is already in the past is flagged, not silently accep
   assert.ok(res.body.missing.includes("start"));
   assert.match(res.body.open_questions[0], /already passed/);
 });
+
+test("buildMessages: a Bulgarian Discord paste with Latin usernames, links and models is still Bulgarian", () => {
+  const chat = [
+    "ivo_bmw_e46: Хайде в неделя на Витоша, тръгваме от OMV Simeonovsko",
+    "maria.gti_mk7: аз съм вътре с голфа https://maps.app.goo.gl/AbCdEfGhIjKlMnOp",
+    "stoyan_e39_530d: не мога тази седмица",
+    "niki_w205_c200: 9:30 става ли",
+  ].join("\n");
+  assert.match(plan.buildMessages(chat, null, now)[1].content, /Write the announcement in Bulgarian\./);
+});

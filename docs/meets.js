@@ -54,19 +54,25 @@ export function carsToText(cars) {
 export const REPO = "GeorgievAlex/revsofia";
 const REQUIRED = ["title", "start", "meeting_point"];
 
-export function validateDraft(draft) {
-  return REQUIRED.filter((key) => !draft[key]);
+// A meet in the past can't go to review, even if the field is filled in.
+export function validateDraft(draft, now = Date.now()) {
+  const missing = REQUIRED.filter((key) => !draft[key]);
+  if (draft.start && !missing.includes("start") && Date.parse(draft.start) <= now) missing.push("start");
+  return missing;
 }
 
-export function reviewIssueUrl(draft) {
-  const body = [
-    "A meet drafted with the RevSofia planner. Review it, then save the JSON below as",
-    `\`data/events/${draft.id}.json\` and run \`npm run build\`.`,
-    "",
-    "```json",
-    JSON.stringify(draft, null, 2),
-    "```",
-  ].join("\n");
-  const params = new URLSearchParams({ title: `Meet: ${draft.title} (${draft.start.slice(0, 10)})`, labels: "meet", body });
-  return `https://github.com/${REPO}/issues/new?${params}`;
+// GitHub rejects very long new-issue URLs, and Cyrillic is percent-encoded at
+// six characters per letter. Past this length the JSON goes to the clipboard
+// and the issue body just asks for it to be pasted.
+export const MAX_ISSUE_URL_LENGTH = 7500;
+
+export function reviewIssueLink(draft) {
+  const title = `Meet: ${draft.title} (${draft.start.slice(0, 10)})`;
+  const issueUrl = (body) => `https://github.com/${REPO}/issues/new?${new URLSearchParams({ title, labels: "meet", body })}`;
+  const json = JSON.stringify(draft, null, 2);
+  const intro = `A meet drafted with the RevSofia planner. Review it, then save the JSON below as\n\`data/events/${draft.id}.json\` and run \`npm run build\`.`;
+  const full = issueUrl(`${intro}\n\n\`\`\`json\n${json}\n\`\`\``);
+  if (full.length <= MAX_ISSUE_URL_LENGTH) return { url: full, json, pasteJson: false };
+  const short = issueUrl(`${intro}\n\nThe planner copied the meet JSON to your clipboard. Paste it below in a json code block.\n\n`);
+  return { url: short, json, pasteJson: true };
 }

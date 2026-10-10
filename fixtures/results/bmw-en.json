@@ -1,6 +1,6 @@
 {
   "status": 200,
-  "ms": 5143,
+  "ms": 17333,
   "body": {
     "event": {
       "title": "Sunday E-series Meet",
@@ -26,10 +26,10 @@
       ]
     },
     "missing": [],
-    "club_reason": "All participants are driving BMW E-series models.",
+    "club_reason": "All participating cars mentioned are BMW E-series models.",
     "open_questions": [
-      "Will there be a coffee stop after the meet or just parking and chatting?"
+      "Do you want to go for coffee after the meet or just park and chat?"
     ],
-    "announcement": "BMW E-series Meet!\nDate: Sunday, Oct 11\nTime: 10:30\nMeeting Point: Ring Mall parking south side\nDestination: TBC\nCome join us for a park and chat!"
+    "announcement": "BMW E-series Meet!\nDate: Sunday, Oct 11\nTime: 10:30\nMeeting Point: Ring Mall parking south side\nDestination: TBC\nJoin us for a Sunday run and chat!"
   }
 }

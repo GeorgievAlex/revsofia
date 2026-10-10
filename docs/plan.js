@@ -1,6 +1,6 @@
 import { FUNCTION_URL } from "./config.js";
 import { toSofiaIso, toLocalInputValue } from "./sofia-time.js";
-import { meetId, parseCarsText, carsToText, validateDraft, reviewIssueUrl } from "./meets.js";
+import { meetId, parseCarsText, carsToText, validateDraft, reviewIssueLink } from "./meets.js";
 
 const $ = (id) => document.getElementById(id);
 const FIELD_INPUT = { title: "d-title", start: "d-start", meeting_point: "d-meeting" };
@@ -106,14 +106,24 @@ $("chat-form").addEventListener("submit", async (event) => {
   }
 });
 
-$("draft").addEventListener("submit", (event) => {
+$("draft").addEventListener("submit", async (event) => {
   event.preventDefault();
   const draft = collectDraft();
   const missing = validateDraft(draft);
   markMissing(missing);
-  if (missing.length) return setStatus($("draft-status"), "Fill in the highlighted fields first.", true);
-  setStatus($("draft-status"), "Opening GitHub in a new tab…");
-  window.open(reviewIssueUrl(draft), "_blank", "noopener");
+  if (missing.length) return setStatus($("draft-status"), "Fill in the highlighted fields first. The start has to be in the future.", true);
+  const link = reviewIssueLink(draft);
+  // Open the tab synchronously so pop-up blockers treat it as the click's result.
+  const tab = window.open(link.url, "_blank", "noopener");
+  if (!link.pasteJson) return setStatus($("draft-status"), "Opening GitHub in a new tab…");
+  try {
+    await navigator.clipboard.writeText(link.json);
+    setStatus($("draft-status"), "This meet is too long for a link, so its JSON is on your clipboard. Paste it into the GitHub issue.");
+  } catch {
+    setStatus($("draft-status"), "Couldn't copy the meet JSON. Copy it from the browser console instead.", true);
+    console.log(link.json);
+  }
+  return tab;
 });
 
 $("copy").addEventListener("click", async () => {

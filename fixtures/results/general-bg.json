@@ -1,6 +1,6 @@
 {
   "status": 200,
-  "ms": 4767,
+  "ms": 9360,
   "body": {
     "event": {
       "title": "Sunday run to Vitosha",
@@ -9,25 +9,27 @@
       "end": null,
       "meeting_point": "бензиностанцията на Симеоновско шосе",
       "destination": "Златните мостове",
-      "description": "Сутринно каране до Витоша с кафе на Златните мостове.",
+      "description": "Run to Vitosha with coffee at Zlatnite Mostove.",
       "cars": [
         {
-          "who": "Ники",
-          "car": ""
-        },
-        {
           "who": "Мария",
-          "car": "Golf"
+          "car": "Голф"
         },
         {
           "who": "Иво",
-          "car": "BMW 335i"
+          "car": "335"
+        },
+        {
+          "who": "Ники",
+          "car": ""
         }
       ]
     },
     "missing": [],
-    "club_reason": "The participants drive different brands (BMW and VW).",
-    "open_questions": [],
-    "announcement": "📅 Неделя, 11 Октомври\n⏰ 09:30 ч.\n📍 Сбиране: Бензиностанцията на Симеоновско шосе\n🏁 Дестинация: Златните мостове\nВидим се там!"
+    "club_reason": "The group includes both a Volkswagen and a BMW.",
+    "open_questions": [
+      "What time will the meet end?"
+    ],
+    "announcement": "📅 Неделя, 11 Октомври\n⏰ 09:30\n📍 Среща: Бензиностанцията на Симеоновско шосе\n🏁 Дестинация: Златните мостове\n☕️ Кафе на пристигане!"
   }
 }
