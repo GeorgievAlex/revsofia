@@ -1,6 +1,7 @@
 ---
-title: "Car meets in Sofia get planned in chaos, so I made an open model read the chat for us"
-published: false
+title: "RevSofia, a Car Meetup app that people will love to use"
+cover_image: https://georgievalex.github.io/revsofia/media/cover.png
+published: true
 tags: devchallenge, hf26challenge, ai, opensource
 ai_disclosure_level: ai_assisted
 ---
@@ -23,6 +24,8 @@ So I built **[RevSofia](https://georgievalex.github.io/revsofia/)**, a meet boar
 - A month **calendar** behind a button in the top nav, with a dot per meet in the club's colour.
 - No chat built in. That happens on [our Discord](https://discord.gg/epUkNA99a), and every club page links there instead of pretending to replace it.
 - When a meet is approved, it's **posted to the Discord automatically**, with the time shown in each reader's own time zone.
+- **Upcoming and Past** views. Once a meet has happened it doesn't vanish, it moves to Past.
+- **Dark by default**, with a light theme one tap away.
 
 The part that makes it work is the **planner**. You paste the group chat, in English or Bulgarian, and an open-weight model (Gemma 4) turns it into a draft meet:
 
@@ -54,7 +57,7 @@ And this is what came back from Gemma in one of my test runs (real output, recor
 
 Here's one of my test chats. I wrote it in Bulgarian, because that's how a lot of these threads actually look:
 
-```
+```plaintext
 Ники: Кой е за Витоша в неделя сутринта?
 Мария: Аз! Идвам с голфа
 Иво: и аз, с 335-ицата. В колко?
@@ -83,7 +86,7 @@ The four meets on the board right now are marked **Example meet**. They're sampl
 
 Same "deliberately boring" rule as my last project: no framework, no database, no npm dependencies.
 
-```
+```plaintext
 browser ── GitHub Pages (static site) + Cloudflare Turnstile
    │  POST the pasted chat + a one-time "I'm human" token
    ▼
@@ -101,6 +104,8 @@ DigitalOcean Serverless Inference → gemma-4-31B-it
 - **Time zones get their own tests.** Bulgaria switches from summer to winter time on 25 Oct. A meet at 10:00 that day is UTC+2, not UTC+3, and the calendar file has to say 08:00Z. There are tests for exactly that, because "the meet's an hour off" is the kind of bug that leaves people standing in an empty parking lot.
 
 57 tests, all `node:test`, no test framework either.
+
+**Show your work.** It's all in the repo: the [design spec](https://github.com/GeorgievAlex/revsofia/blob/main/design/2026-10-10-revsofia-design.md) and [build plan](https://github.com/GeorgievAlex/revsofia/blob/main/design/2026-10-10-revsofia-plan.md) written before any code, the [three logo concepts](https://github.com/GeorgievAlex/revsofia/tree/main/design/logo) that came before the final one, and a [commit history](https://github.com/GeorgievAlex/revsofia/commits/main) where every bug in the next section has its own fix commit.
 
 ## What I got wrong on the way
 
@@ -131,3 +136,5 @@ The first real run against the live model taught me more than the unit tests did
 ## What's next
 
 The four meets on the board are examples. The next step is replacing them with real ones from our Discord and seeing how Gemma handles a proper 200-message thread, slang, typos and all. After that: suggesting a route for the drive, and a small news section for each club.
+
+**Got a car in Sofia?** [Join the RevSofia Discord](https://discord.gg/epUkNA99a), drop your next meet in the chat, and let Gemma do the planning.
