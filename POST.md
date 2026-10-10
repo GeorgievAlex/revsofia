@@ -20,7 +20,8 @@ So I built **[RevSofia](https://georgievalex.github.io/revsofia/)**, a meet boar
 - **General meets** for everyone, whatever you drive.
 - **Club meets** for the brand crowds: BMW, Mercedes-Benz, and Audi/VW Group (VW, Skoda, Seat, Cupra and Porsche count too).
 - Every meet has an **Add to calendar** button, so the plan ends up on your phone and you end up on the road.
-- No chat built in. The clubs already live on Discord, so each club page links there instead of pretending to replace it.
+- A month **calendar** behind a button in the top nav, with a dot per meet in the club's colour.
+- No chat built in. That happens on [our Discord](https://discord.gg/epUkNA99a), and every club page links there instead of pretending to replace it.
 
 The part that makes it work is the **planner**. You paste the group chat, in English or Bulgarian, and an open-weight model (Gemma 4) turns it into a draft meet:
 
@@ -74,11 +75,11 @@ The four meets on the board right now are marked **Example meet**. They're sampl
 Same "deliberately boring" rule as my last project: no framework, no database, no npm dependencies.
 
 ```
-browser ── GitHub Pages (static site)
-   │  POST the pasted chat
+browser ── GitHub Pages (static site) + Cloudflare Turnstile
+   │  POST the pasted chat + a one-time "I'm human" token
    ▼
 DigitalOcean Function  (holds the model key)
-   │
+   │  checks the token with Cloudflare first
    ▼
 DigitalOcean Serverless Inference → gemma-4-31B-it
 ```
@@ -86,9 +87,10 @@ DigitalOcean Serverless Inference → gemma-4-31B-it
 - **The meets are JSON files in the repo.** A tiny Node build script validates them and spits out the site's data plus one `.ics` calendar file per meet. Approving a meet is literally merging a file.
 - **One DigitalOcean Function does the AI part.** It exists so the model key never touches the browser. It caps the chat at 8,000 characters, never forwards upstream errors to the client, and runs the model's JSON through the same validation module the build uses. So a model hallucinating a club called "porsche" gets clamped to General instead of breaking anything.
 - **Gemma 4 runs on DigitalOcean Serverless Inference.** It's an OpenAI-compatible endpoint, so there's no GPU to babysit. The model is one line of config.
+- **The logo is hand-drawn SVG.** It's a rev gauge sweeping into the redline, with the Vitosha ridge underneath, because every Sofia meet ends up driving towards that mountain anyway. It's generated with a few lines of trig so the ticks and arcs land on exact angles.
 - **Time zones get their own tests.** Bulgaria switches from summer to winter time on 25 Oct. A meet at 10:00 that day is UTC+2, not UTC+3, and the calendar file has to say 08:00Z. There are tests for exactly that, because "the meet's an hour off" is the kind of bug that leaves people standing in an empty parking lot.
 
-39 tests, all `node:test`, no test framework either.
+51 tests, all `node:test`, no test framework either.
 
 ## What I got wrong on the way
 
@@ -96,9 +98,11 @@ The first real run against the live model taught me more than the unit tests did
 
 **"Saturday morning" became a Saturday that had already passed.** I ran the tests on a Saturday evening. The model knew the date but not the time, so "foliage drive saturday morning" became *that same morning*, which was over by then. Its own announcement said "tomorrow" next to today's date. The fix had two parts: the prompt now gets the current Sofia time, and the function flags any start in the past as unresolved. That way even if the model gets it wrong again, the organiser sees a red field instead of a meet that already happened.
 
-**An English chat got a Bulgarian announcement.** I'd told the model to "use the language most of the chat is in." It didn't, at least not reliably. Now the function counts Cyrillic vs Latin letters and tells the model which language to write in. That's a boring, deterministic rule, and I trust it more than a vibe.
+**An English chat got a Bulgarian announcement.** I'd told the model to "use the language most of the chat is in." It didn't, at least not reliably. Now the function decides the language itself and tells the model which one to write in. My first version just counted Cyrillic vs Latin letters, and a code review caught that a normal Bulgarian Discord paste fails it: usernames like `ivo_bmw_e46`, map links and car models are all Latin. So it strips usernames and links first, and calls it Bulgarian once about a third of what's left is Cyrillic. That's a boring, deterministic rule, and I trust it more than a vibe.
 
 **The deploy broke CORS in a way no local test could catch.** The browser refused every request because the response said `Access-Control-Allow-Origin: *, https://georgievalex.github.io`. That's two values, which isn't allowed. DigitalOcean's gateway adds `*` on its own, and my function added the real origin on top. One annotation in `project.yml` (`web-custom-options: true`) hands CORS fully to the function, which also keeps the origin locked to my site.
+
+**I almost shipped an endpoint anyone could run up a bill on.** CORS only stops browsers. Anyone with `curl` could hit the function in a loop, and every call costs Gemma tokens plus function time. The AI part is prepaid on DigitalOcean, so with auto-reload off the worst case is the balance running dry. Functions are billed after the fact, though, and a loop would also just take the planner down for real users. So the planner now has a Cloudflare Turnstile check. The function only calls the model if the request carries a fresh, single-use token, checked against the visitor's IP and my hostname. A forged token gets a `403` in about 0.3 seconds, before a single token is spent.
 
 **It still invents a little.** In one test chat a guy just said "E-series Sunday?" without naming his car, and the model listed him as driving an "E-series". It's minor, but it's exactly why there's a human review step before anything goes live.
 
