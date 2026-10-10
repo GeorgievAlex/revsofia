@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RevSofia: car meets in Sofia</title>
+  <meta name="description" content="Car meets in Sofia. General meets for every brand, club meets for BMW, Mercedes and Audi/VW Group.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site">
+    <a class="brand" href="./">Rev<span>Sofia</span></a>
+    <nav><a href="./" aria-current="page">Meets</a><a href="plan.html">Plan a meet</a></nav>
+  </header>
+  <main>
+    <section class="intro">
+      <h1>Get the car out. Meet people.</h1>
+      <p>General meets are open to every brand. Club meets are for the BMW, Mercedes and Audi/VW crowd. Add any meet to your calendar, then go drive.</p>
+    </section>
+    <nav id="chips" class="chips" aria-label="Filter by club"></nav>
+    <section id="club-header" class="club-header" hidden></section>
+    <section id="meets" class="meets" aria-live="polite"><p class="muted">Loading meets…</p></section>
+  </main>
+  <footer class="site">
+    <p>Built for the DEV Hacktoberfest Open-Source AI Challenge. Meet drafts by Gemma 4 on DigitalOcean. <a href="https://github.com/GeorgievAlex/revsofia">Source</a></p>
+  </footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
