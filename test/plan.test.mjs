@@ -4,16 +4,28 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const plan = require("../packages/revsofia/plan/index.js");
 
-const env = { DO_INFERENCE_KEY: "test-key", MODEL: "gemma-4-31B-it", ALLOWED_ORIGIN: "https://georgievalex.github.io" };
+const env = {
+  DO_INFERENCE_KEY: "test-key", MODEL: "gemma-4-31B-it", ALLOWED_ORIGIN: "https://georgievalex.github.io",
+  TURNSTILE_SECRET: "ts-secret", TURNSTILE_HOSTNAME: "georgievalex.github.io",
+};
 const now = Date.parse("2026-10-10T09:00:00Z");
 
-function fakeFetch(content, { status = 200 } = {}) {
+// Answers Turnstile siteverify (recorded in fn.verifies) and inference
+// (recorded in fn.calls) the way the real endpoints would.
+function fakeFetch(content, { status = 200, verify = { success: true, hostname: "georgievalex.github.io" } } = {}) {
   const calls = [];
+  const verifies = [];
   const fn = async (url, init) => {
+    if (url.includes("/turnstile/v0/siteverify")) {
+      verifies.push(Object.fromEntries(new URLSearchParams(init.body)));
+      if (verify instanceof Error) throw verify;
+      return { ok: true, status: 200, json: async () => verify };
+    }
     calls.push({ url, init: { ...init, body: JSON.parse(init.body) } });
     return { ok: status >= 200 && status < 300, status, json: async () => ({ choices: [{ message: { content } }] }) };
   };
   fn.calls = calls;
+  fn.verifies = verifies;
   return fn;
 }
 
@@ -22,7 +34,7 @@ const draft = {
   meeting_point: "OMV", destination: "Vitosha", description: null,
   cars: [{ who: "Ivo", car: "E92" }], open_questions: ["Coffee stop?"], announcement: "Sunday 09:30 at OMV",
 };
-const req = (body) => ({ method: "POST", rawBody: JSON.stringify(body) });
+const req = (body, ip = "203.0.113.7") => ({ method: "POST", rawBody: JSON.stringify({ turnstile: "tok", ...body }), ip });
 
 test("handle: fenced JSON from the model becomes a normalised draft", async () => {
   const f = fakeFetch("Here you go:\n```json\n" + JSON.stringify(draft) + "\n```");
@@ -97,6 +109,7 @@ test("main: OPTIONS preflight and CORS header", async () => {
 
 test("main: decodes a base64 raw body", async () => {
   process.env.DO_INFERENCE_KEY = "test-key";
+  process.env.TURNSTILE_SECRET = "ts-secret";
   const body = Buffer.from(JSON.stringify({ chat: "   " })).toString("base64");
   const res = await plan.main({ __ow_method: "post", __ow_body: body });
   // "Paste a chat first" (not "Body must be valid JSON") proves the body decoded
@@ -104,6 +117,7 @@ test("main: decodes a base64 raw body", async () => {
   assert.equal(res.statusCode, 400);
   assert.match(JSON.parse(res.body).error, /Paste a chat first/);
   delete process.env.DO_INFERENCE_KEY;
+  delete process.env.TURNSTILE_SECRET;
 });
 
 test("buildMessages: gives the current Sofia time and picks the announcement language", () => {
@@ -132,4 +146,44 @@ test("buildMessages: a Bulgarian Discord paste with Latin usernames, links and m
     "niki_w205_c200: 9:30 става ли",
   ].join("\n");
   assert.match(plan.buildMessages(chat, null, now)[1].content, /Write the announcement in Bulgarian\./);
+});
+
+test("turnstile: a missing token is refused before any network call", async () => {
+  const f = fakeFetch(JSON.stringify(draft));
+  const res = await plan.handle({ method: "POST", rawBody: JSON.stringify({ chat: "x" }) }, { env, fetchImpl: f, now });
+  assert.equal(res.status, 403);
+  assert.equal(f.verifies.length + f.calls.length, 0);
+});
+
+test("turnstile: the token is verified with the secret and visitor IP before inference", async () => {
+  const f = fakeFetch(JSON.stringify(draft));
+  const res = await plan.handle(req({ chat: "x" }), { env, fetchImpl: f, now });
+  assert.equal(res.status, 200);
+  assert.deepEqual(f.verifies, [{ secret: "ts-secret", response: "tok", remoteip: "203.0.113.7" }]);
+  assert.equal(f.calls.length, 1);
+});
+
+test("turnstile: failed, foreign-hostname or unreachable verification never reaches the model", async () => {
+  for (const [verify, status] of [
+    [{ success: false, "error-codes": ["timeout-or-duplicate"] }, 403],
+    [{ success: true, hostname: "evil.example" }, 403],
+    [new Error("ECONNRESET"), 502],
+  ]) {
+    const f = fakeFetch(JSON.stringify(draft), { verify });
+    const res = await plan.handle(req({ chat: "x" }), { env, fetchImpl: f, now });
+    assert.equal(res.status, status, JSON.stringify(verify));
+    assert.equal(f.calls.length, 0);
+  }
+});
+
+test("turnstile: fails closed when the secret isn't configured", async () => {
+  const f = fakeFetch(JSON.stringify(draft));
+  const res = await plan.handle(req({ chat: "x" }), { env: { ...env, TURNSTILE_SECRET: "" }, fetchImpl: f, now });
+  assert.equal(res.status, 500);
+  assert.equal(f.verifies.length + f.calls.length, 0);
+});
+
+test("clientIp: first address in x-forwarded-for", () => {
+  assert.equal(plan.clientIp({ __ow_headers: { "x-forwarded-for": "198.51.100.4, 10.0.0.1" } }), "198.51.100.4");
+  assert.equal(plan.clientIp({}), "");
 });

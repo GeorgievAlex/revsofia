@@ -3,13 +3,16 @@
 // using Gemma 4 on DigitalOcean Serverless Inference. Exists so the model
 // access key never reaches the browser.
 //
-// Environment (project.yml): DO_INFERENCE_KEY (secret, from .env), MODEL,
-// ALLOWED_ORIGIN. The real spend ceiling is the prepaid DO Inference balance
-// with auto-reload off; CORS only stops browsers, not curl.
+// Environment (project.yml): DO_INFERENCE_KEY and TURNSTILE_SECRET (secrets,
+// from .env), MODEL, ALLOWED_ORIGIN, TURNSTILE_HOSTNAME. CORS only stops
+// browsers; Cloudflare Turnstile is what stops scripts, and every request
+// must carry a fresh token before the model is called. The hard spend
+// ceiling is still the prepaid DO Inference balance with auto-reload off.
 
 const { CLUB_IDS, TIME_ZONE, normalizeEvent, cleanText } = require("./event.js");
 
 const INFERENCE_URL = "https://inference.do-ai.run/v1/chat/completions";
+const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const MAX_CHAT_LENGTH = 8000;
 
 const SYSTEM_PROMPT = `You turn a car club's group chat into a draft meet for RevSofia, a car-meet site for Sofia, Bulgaria.
@@ -71,9 +74,33 @@ function parseModelJson(text) {
 
 const fail = (status, error) => ({ status, body: { error } });
 
-async function handle({ method, rawBody }, { env, fetchImpl, now }) {
+// Tokens are single-use and expire after 5 minutes, so any failure here means
+// the visitor has to tick the box again.
+async function verifyTurnstile(token, ip, env, fetchImpl) {
+  const form = new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token });
+  if (ip) form.set("remoteip", ip);
+  let result;
+  try {
+    const res = await fetchImpl(SITEVERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: form.toString(),
+    });
+    result = await res.json();
+  } catch {
+    return fail(502, "Couldn't run the bot check. Try again in a moment.");
+  }
+  if (!result || result.success !== true) return fail(403, "The bot check failed or expired. Tick the box again.");
+  if (env.TURNSTILE_HOSTNAME && result.hostname !== env.TURNSTILE_HOSTNAME) {
+    return fail(403, "The bot check came from another site.");
+  }
+  return null;
+}
+
+async function handle({ method, rawBody, ip = "" }, { env, fetchImpl, now }) {
   if (method !== "POST") return fail(405, "POST a JSON body with a chat field.");
   if (!env.DO_INFERENCE_KEY) return fail(500, "The function is missing its DO_INFERENCE_KEY.");
+  if (!env.TURNSTILE_SECRET) return fail(500, "The function is missing its TURNSTILE_SECRET.");
 
   let input;
   try {
@@ -86,6 +113,10 @@ async function handle({ method, rawBody }, { env, fetchImpl, now }) {
   if (chat.length > MAX_CHAT_LENGTH) return fail(400, `Chat must be ${MAX_CHAT_LENGTH} characters or fewer. Trim the older messages.`);
   const hint = input.club_hint == null || input.club_hint === "auto" ? null : input.club_hint;
   if (hint !== null && !CLUB_IDS.includes(hint)) return fail(400, `club_hint must be "auto" or one of ${CLUB_IDS.join(", ")}.`);
+  const token = typeof input.turnstile === "string" ? input.turnstile : "";
+  if (!token || token.length > 2048) return fail(403, "Tick the \"I'm human\" box first.");
+  const rejected = await verifyTurnstile(token, ip, env, fetchImpl);
+  if (rejected) return rejected;
 
   let upstream;
   try {
@@ -147,6 +178,11 @@ function decodeBody(args) {
   }
 }
 
+function clientIp(args) {
+  const forwarded = args.__ow_headers && args.__ow_headers["x-forwarded-for"];
+  return typeof forwarded === "string" ? forwarded.split(",")[0].trim() : "";
+}
+
 async function main(args) {
   const env = process.env;
   const headers = {
@@ -157,8 +193,8 @@ async function main(args) {
   };
   const method = String(args.__ow_method || "post").toUpperCase();
   if (method === "OPTIONS") return { statusCode: 204, headers };
-  const { status, body } = await handle({ method, rawBody: decodeBody(args) }, { env, fetchImpl: fetch, now: Date.now() });
+  const { status, body } = await handle({ method, rawBody: decodeBody(args), ip: clientIp(args) }, { env, fetchImpl: fetch, now: Date.now() });
   return { statusCode: status, headers, body: JSON.stringify(body) };
 }
 
-module.exports = { main, handle, parseModelJson, buildMessages };
+module.exports = { main, handle, parseModelJson, buildMessages, clientIp };

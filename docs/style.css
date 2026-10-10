@@ -51,3 +51,4 @@ textarea { min-height: 120px; resize: vertical; }
 .theme-toggle { background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 0.85rem; cursor: pointer; }
 .theme-toggle:hover { color: var(--text); }
 header.site nav { align-items: center; }
+.turnstile { margin-top: 14px; min-height: 65px; }

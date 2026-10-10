@@ -1,4 +1,4 @@
-import { FUNCTION_URL } from "./config.js";
+import { FUNCTION_URL, TURNSTILE_SITEKEY } from "./config.js";
 import { toSofiaIso, toLocalInputValue } from "./sofia-time.js";
 import { meetId, parseCarsText, carsToText, validateDraft, reviewIssueLink } from "./meets.js";
 
@@ -80,12 +80,55 @@ function collectDraft() {
   };
 }
 
+// Cloudflare Turnstile: the function only calls the model for a request that
+// carries a fresh token. Tokens are single-use, so the widget resets after
+// every request.
+let turnstileToken = "";
+let turnstileWidget = null;
+
+function setToken(token) {
+  turnstileToken = token;
+  $("generate").disabled = !token;
+}
+
+function renderTurnstile() {
+  turnstileWidget = window.turnstile.render("#turnstile", {
+    sitekey: TURNSTILE_SITEKEY,
+    action: "plan",
+    theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
+    callback: (token) => setToken(token),
+    "expired-callback": () => setToken(""),
+    "error-callback": () => {
+      setToken("");
+      setStatus($("status"), "The bot check couldn't load. Refresh the page to try again.", true);
+    },
+  });
+}
+
+function resetTurnstile() {
+  setToken("");
+  if (window.turnstile && turnstileWidget !== null) window.turnstile.reset(turnstileWidget);
+}
+
+function loadTurnstile() {
+  if (!TURNSTILE_SITEKEY) {
+    setStatus($("status"), "The planner's bot check isn't configured yet.", true);
+    return;
+  }
+  window.onTurnstileLoad = renderTurnstile;
+  const script = document.createElement("script");
+  script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad";
+  script.async = true;
+  document.head.append(script);
+}
+
 $("chat-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const status = $("status");
   if (!FUNCTION_URL) return setStatus(status, "The planner isn't connected yet (no function URL configured).", true);
   const chat = $("chat").value.trim();
   if (!chat) return setStatus(status, "Paste a chat first.", true);
+  if (!turnstileToken) return setStatus(status, "Tick the \"I'm human\" box first.", true);
   $("generate").disabled = true;
   setStatus(status, "Reading the chat… this takes a few seconds.");
   try {
@@ -93,7 +136,7 @@ $("chat-form").addEventListener("submit", async (event) => {
     const res = await fetch(FUNCTION_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ chat, club_hint: $("club-hint").value }),
+      body: JSON.stringify({ chat, club_hint: $("club-hint").value, turnstile: turnstileToken }),
     });
     const data = await res.json().catch(() => ({ error: `Unexpected response (${res.status}).` }));
     if (!res.ok) return setStatus(status, data.error || `Something went wrong (${res.status}).`, true);
@@ -102,7 +145,7 @@ $("chat-form").addEventListener("submit", async (event) => {
   } catch {
     setStatus(status, "Couldn't reach the planner. Check your connection and try again.", true);
   } finally {
-    $("generate").disabled = false;
+    resetTurnstile();
   }
 });
 
@@ -138,3 +181,4 @@ $("copy").addEventListener("click", async () => {
 });
 
 loadClubs();
+loadTurnstile();

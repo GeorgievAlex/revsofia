@@ -16,6 +16,8 @@ packages:
           DO_INFERENCE_KEY: ${DO_INFERENCE_KEY}
           MODEL: gemma-4-31B-it
           ALLOWED_ORIGIN: https://georgievalex.github.io
+          TURNSTILE_SECRET: ${TURNSTILE_SECRET}
+          TURNSTILE_HOSTNAME: georgievalex.github.io
         limits:
           timeout: 60000
           memory: 256
