@@ -99,3 +99,22 @@ header.site nav a { white-space: nowrap; }
 .view-tab { text-decoration: none; padding: 6px 14px; border-radius: 7px; color: var(--muted); font-size: 0.92rem; }
 .view-tab[aria-current="true"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 0 0 1px var(--line); }
 .badge.past { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+.discord-nav { display: inline-flex; align-items: center; gap: 6px; background: #5865F2; color: #fff !important; text-decoration: none; padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.discord-nav:hover { background: #4752c4; }
+.discord-icon { width: 16px; height: 16px; flex: none; }
+.discord-cta { margin: 0 0 14px; }
+.discord-button { display: flex; align-items: center; justify-content: center; gap: 8px; background: #5865F2; color: #fff; text-decoration: none; font-weight: 700; padding: 12px 16px; border-radius: 10px; }
+.discord-button:hover { background: #4752c4; }
+.discord-button .discord-icon { width: 20px; height: 20px; }
+@media (max-width: 480px) {
+  .discord-nav { padding: 5px 7px; }
+  .discord-nav span { display: none; }
+}
+/* Narrow screens: logo on its own row, the whole nav spread across the row below. */
+@media (max-width: 640px) {
+  header.site { flex-wrap: wrap; row-gap: 10px; padding-top: 14px; padding-bottom: 14px; }
+  header.site nav { width: 100%; justify-content: space-between; gap: 6px; font-size: 0.9rem; }
+  .brand { font-size: 1.2rem; gap: 6px; }
+  .logo { width: 30px; height: 30px; }
+  .wordmark { display: inline; }
+}

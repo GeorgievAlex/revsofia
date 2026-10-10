@@ -95,6 +95,8 @@ function renderTurnstile() {
   turnstileWidget = window.turnstile.render("#turnstile", {
     sitekey: TURNSTILE_SITEKEY,
     action: "plan",
+    // The normal widget is a fixed 300px, wider than the form on small phones.
+    size: window.innerWidth < 400 ? "compact" : "normal",
     theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
     callback: (token) => setToken(token),
     "expired-callback": () => setToken(""),
